@@ -1,7 +1,8 @@
 const pool = require("../../config/database")
 module.exports = {
-    create: (data,callback) =>{
-    pool.query(
+    create: (data) =>{
+    return new Promise((resolve,reject)=>{
+        pool.query(
         `insert into registration (firstName, lastName, gender, email, password, number)
         values(?,?,?,?,?,?)`,
     [
@@ -15,40 +16,44 @@ module.exports = {
     (error,results,fields)=>{
         if(error)
         {
-            return callback(error);
+            return reject(error);
         }
-        return callback(null,results);
-    });        
+        return resolve(results);
+    }
+    )});        
     },
-    getUsers: callback=>{
-        pool.query(
+    getUsers: ()=>{
+       return new Promise((resolve,reject)=>{pool.query(
             `select firstName, lastName, gender, email, number from registration`,
             [],
             (error,results,fields)=>{
                 if(error)
                 {
-                    return callback(error);
+                    return reject(error);
                 }
-                return callback(null,results);
+                return resolve(results);
             }
-        );
+        )});
     },
-    getUserByUserId: (id,callback)=>{
-        pool.query(
-            `select id, firstName, lastName, email, number where id= ?`,
+    getUserByUserId: (id)=>{
+       return new Promise((resolve,reject)=>{
+
+            pool.query(
+            `select id, firstName, lastName, email, number from registration where id= ?`,
             [id],
             (error,results,fields)=>{
                 if(error)
                 {
-                    return callback(error);
+                    return reject(error);
                 }
-                return callback(null,results);
+                return resolve(results);
             }
-        );
+        )});
     },
-    updateUser: (data,callback) =>{
-        pool.query(
-            `update registration set firstName=?, lastName=?, gender=?, email=?, password=?, number=?`,
+    updateUser: (data) =>{
+        return new Promise((resolve,reject)=>{
+            pool.query(
+            `update registration set firstName=?, lastName=?, gender=?, email=?, password=?, number=? where email = ?`,
         [
             data.firstName,
             data.lastName,
@@ -60,38 +65,51 @@ module.exports = {
         (error,results,fields)=>{
             if(error)
             {
-                return callback(error);
+                return reject(error);
             }
-            return callback(null,results[0]);
-        });        
+            return resolve(results[0]);
+        }
+        )});        
         },
-    deleteUser: (data,callback)=>{
-        pool.query(
+    deleteUser: (data)=>{
+        return new Promise((resolve,reject)=>{
+            pool.query(
             `delete from registration where id=?`,
             [data.id],
             (error,results,fields)=>{
                 if(error)
             {
-                return callback(error);
+                return reject(error);
             }
-            return callback(null,results[0]);
+            return resolve(results[0]);
             }
-        );
+        )});
     },
-    getUserByUserEmail:(email,callback)=>{
-        pool.query(
+    getUserByUserEmail:(email)=>{
+        return new Promise((resolve,reject)=>{
+            pool.query(
             `select * from registration where email = ? `,
             [email],
-            (error,results,fileds)=>{
+            (error,results,fields)=>{
                 if(error){
-                    return callback(error);
-                }
-                return callback(null,results[0]);
-            }
+                            return reject(error);
+                        }
+                        console.log('resolved from service');
+                        return resolve(results[0]);
+            }) 
+        }
+            // (error,results,fileds)=>{
+            //     if(error){
+            //         return callback(error);
+            //     }
+            //     return callback(null,results[0]);
+            // }
         );
     },
-    signUp: (data,callback) =>{
-        pool.query(
+    signUp: (data) =>{
+        console.log("Inside Signup")
+        return new Promise((resolve,reject)=>{
+            pool.query(
             `insert into registration (firstName, lastName, gender, email, password, number)
             values(?,?,?,?,?,?)`,
         [
@@ -105,9 +123,10 @@ module.exports = {
         (error,results,fields)=>{
             if(error)
             {
-                return callback(error);
+                return reject(error);
             }
-            return callback(null,results);
-        });        
+            return resolve(results);
+        }
+        )});        
         }
 };
